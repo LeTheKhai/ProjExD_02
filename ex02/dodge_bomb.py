@@ -49,14 +49,19 @@ def main():
 
     clock = pg.time.Clock()
     tmr = 0
+    count = 1000000
+    accs = [a for a in range(1, 11)]
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_imgs.append(bb_img)
+    bb_img = bb_imgs[min(tmr//500, 9)]
+    bb_img.set_colorkey((0, 0, 0))
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
-
-        if kk_rct.colliderect(bb_rct):
-            print("Game Over")
-            return
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
@@ -67,8 +72,7 @@ def main():
 
         if tuple(sum_mv) in delta1.keys():
             kk_img = delta1[tuple(sum_mv)]
-            screen.blit(kk_img, kk_rct)
-            pg.display.update()
+
         screen.blit(bg_img, [0, 0])
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
         if check_bound(kk_rct) != (True, True):
@@ -80,11 +84,21 @@ def main():
             vx *= -1
         if not tate:
             vy *= -1
-        bb_rct.move_ip(vx, vy)
+        if kk_rct.colliderect(bb_rct):
+            kk_img = pg.image.load("ex02-20231128/fig/8.png")
+            kk_img = pg.transform.rotozoom(kk_img, 0, 2)
+
+            count = tmr
+        avx, avy = vx*accs[min(tmr//500, 9)], vy*accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_img.set_colorkey((0, 0, 0))
+        bb_rct.move_ip(avx, avy)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
         clock.tick(50)
+        if tmr == count + 2:
+            return
 
 
 if __name__ == "__main__":
